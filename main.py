@@ -42,7 +42,7 @@ longitude = [i['geometry']['coordinates'][0] for i in data]
 latitude = [i['geometry']['coordinates'][1] for i in data]
 
 addresses = pd.DataFrame({'street_numbers': street_numbers, 'street_name': street_name, 'postcode': postcode, 'longitude': longitude, 'latitude': latitude})
-addresses["full_address"] = addresses["street_numbers"].map(str) + " " + addresses["street_name"] + f", {city_name}, TX " + addresses["postcode"]
+addresses["full_address"] = addresses["street_numbers"].map(str) + " " + addresses["street_name"] + f", {city_name}, {state_abbr} " + addresses["postcode"]
 
 # address should be in the format of "1234 Main St, San Antonio, TX 78201"
 miles_per_degree_lat = 68.93939393939394
