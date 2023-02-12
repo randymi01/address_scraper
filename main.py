@@ -1,3 +1,5 @@
+# Texas Branch
+
 import pandas as pd
 import numpy as np
 import json
@@ -7,7 +9,6 @@ geolocator = Nominatim(user_agent="nrpgroup")
 
 # file_name "bexar-addresses-county.geojson"
 file_name = input("Geojson Filename (bexar-addresses-county.geojson): ").lower()
-state_abbr = input("State Abbreviation (TX): ").upper()
 
 # San Antonio
 city_name = input("City Name (San Antonio): ").title()
@@ -49,7 +50,7 @@ miles_per_degree_lat = 68.93939393939394
 miles_per_degree_lon = 54.5985401459854
 
 def get_closest_addresses(address: str, df: pd.DataFrame, max_radius = 5, max_results = 100):
-    address = address + f", {city_name} {state_abbr}"
+    address = address + f", {city_name}"
     
     try:
         location = geolocator.geocode(address)
