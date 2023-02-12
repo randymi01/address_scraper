@@ -1,2 +1,5 @@
 *.csv
 *.geojson
+env/
+!geojson/example.geojson
+!geojson/example-formatted.geojson
