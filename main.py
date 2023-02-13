@@ -35,7 +35,14 @@ else:
 with open(f"geojson/{out_file_name}") as f:
     data = json.load(f)
 
-street_numbers = [int(i['properties']['number']) for i in data]
+def str_to_addrnum(addr: str):
+    try:
+        return int(addr.split(" ")[0])
+    except ValueError:
+        return np.nan
+
+# add support for weird address formats
+street_numbers = [str_to_addrnum(i['properties']['number']) for i in data]
 street_name = [i['properties']['street'] for i in data]
 postcode = [i['properties']['postcode'] for i in data]
 longitude = [i['geometry']['coordinates'][0] for i in data]
