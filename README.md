@@ -12,5 +12,7 @@ Issues:
 * Nominatim will sometimes be unresponsive
 * Results are limited by selected county. Will produce poor results for properties on county borders
 * Addresses will be assigned to a single city
+* Validate addresses on Zillow
+* Fix custom distance/result num bug
 
 
