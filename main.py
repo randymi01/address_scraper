@@ -1,5 +1,3 @@
-# Texas Branch
-
 import pandas as pd
 import numpy as np
 import json
@@ -9,6 +7,7 @@ geolocator = Nominatim(user_agent="nrpgroup")
 
 # file_name "bexar-addresses-county.geojson"
 file_name = input("Geojson Filename (bexar-addresses-county.geojson): ").lower()
+state_abbr = input("State Abbreviation (TX): ").upper()
 
 # San Antonio
 city_name = input("City Name (San Antonio): ").title()
@@ -36,21 +35,28 @@ else:
 with open(f"geojson/{out_file_name}") as f:
     data = json.load(f)
 
-street_numbers = [int(i['properties']['number']) for i in data]
+def str_to_addrnum(addr: str):
+    try:
+        return int(addr.split(" ")[0])
+    except ValueError:
+        return np.nan
+
+# add support for weird address formats
+street_numbers = [str_to_addrnum(i['properties']['number']) for i in data]
 street_name = [i['properties']['street'] for i in data]
 postcode = [i['properties']['postcode'] for i in data]
 longitude = [i['geometry']['coordinates'][0] for i in data]
 latitude = [i['geometry']['coordinates'][1] for i in data]
 
 addresses = pd.DataFrame({'street_numbers': street_numbers, 'street_name': street_name, 'postcode': postcode, 'longitude': longitude, 'latitude': latitude})
-addresses["full_address"] = addresses["street_numbers"].map(str) + " " + addresses["street_name"] + f", {city_name}, TX " + addresses["postcode"]
+addresses["full_address"] = addresses["street_numbers"].map(str) + " " + addresses["street_name"] + f", {city_name}, {state_abbr} " + addresses["postcode"]
 
 # address should be in the format of "1234 Main St, San Antonio, TX 78201"
 miles_per_degree_lat = 68.93939393939394
 miles_per_degree_lon = 54.5985401459854
 
 def get_closest_addresses(address: str, df: pd.DataFrame, max_radius = 5, max_results = 100):
-    address = address + f", {city_name}"
+    address = address + f", {city_name} {state_abbr}"
     
     try:
         location = geolocator.geocode(address)
@@ -58,7 +64,7 @@ def get_closest_addresses(address: str, df: pd.DataFrame, max_radius = 5, max_re
         lon = location.longitude
     except AttributeError:
         print("Error: Address not found.\n")
-        return
+        print("ctrl+c to exit or try again.\n")
     
     distance = np.sqrt(((df["latitude"] - lat)*miles_per_degree_lat)**2 + ((df["longitude"] - lon)*miles_per_degree_lon)**2)
     distance.sort_values(inplace=True)
@@ -78,9 +84,13 @@ max_res = input("What is the maximum results you would like to return? (default:
 
 if not max_rad:
     max_rad = 5
-
+else:
+    max_rad = int(max_rad)
+    
 if not max_res:
     max_res = 100
+else:
+    max_res = int(max_res)
 
 while True:
     addr = input("What address would you like to find the closest addresses to?\nFormat: 1234 Main St\nInput (press ctrl+c to exit): ")
